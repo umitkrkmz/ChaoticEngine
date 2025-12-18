@@ -1,0 +1,102 @@
+﻿# Visual Studio user-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio temporary files, folders and caches
+.vs/
+*.csproj.vspscc
+*.vssscc
+.DS_Store
+*.pidb
+*.svclog
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pyc
+*.pyo
+*.build. આપણે
+
+# Visual Studio profiler files
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Visual Studio files
+*.Cache
+ClientBin
+~$*
+*~
+*.dbmdl
+*.dbproj.schemaview
+*.pde
+*.rdl.data
+*.reports
+*.sln.ide
+*.sql
+*.sql.query
+*.sql.widgets
+*.sqlproj
+*.xsd
+*.xsx
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+packages/
+*.[Pp]ackages.*
+*.[Cc]ore.
+
+# Other
+*.sass-cache
+*.cache
+*.bak
+*.orig
+*.swp
+*.zip
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

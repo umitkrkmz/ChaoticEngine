@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ChaoticEngine.Analysis/ChaoticEngine.Analysis.csproj" Id="e05dcb01-30ea-4475-bac7-9bc241b9ed75" />
+  <Project Path="ChaoticEngine.Benchmark/ChaoticEngine.Benchmark.csproj" Id="9e788477-c225-4aa8-983c-850d86c81f7d" />
+  <Project Path="ChaoticEngine.Core/ChaoticEngine.Core.csproj" />
+</Solution>

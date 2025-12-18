@@ -1,0 +1,32 @@
+# Handle line endings automatically for text files
+# (Normalizes line endings to LF on checkin, CRLF on checkout for Windows)
+* text=auto
+
+# C# Source Files
+*.cs     text diff=csharp
+*.fs     text diff=fsharp
+*.xaml   text merge=union
+
+# Visual Studio Solution & Project Files
+*.sln    text merge=union
+*.slnx   text merge=union
+*.csproj text merge=union
+*.props  text merge=union
+*.targets text merge=union
+
+# Binary Files (Do not touch line endings or try to merge)
+*.dll binary
+*.pdb binary
+*.exe binary
+*.nupkg binary
+*.snupkg binary
+*.zip binary
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ttf binary
+*.eot binary
+*.woff binary
+*.woff2 binary
