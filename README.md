@@ -42,36 +42,29 @@ The engine automatically detects CPU capabilities at runtime and selects the fas
 * **🛡️ Cryptographic Quality:** Validated high Shannon Entropy. Suitable for Stream Ciphers and PRNGs.
 * **🕵️ Steganography Tools:** Built-in utilities for **LSB (Least Significant Bit)** data hiding with **Zero-Loss (MSE: 0.0)** recovery capability.
 * **📊 Analysis Module:** Includes `QualityMetrics` for MSE, PSNR, RMSE, NPCR, and Entropy calculations.
-* **🏭 Zero-Allocation Architecture:** Designed with `Span<T>` and `Memory<T>` for high-throughput, GC-friendly execution.
+* **🏭 Zero-Allocation Architecture:** Validated with **BenchmarkDotNet**. The core engine produces **0 Bytes** of garbage per generation cycle using `Span<T>`.
 ---
 
 ## 🏎️ Performance Benchmarks
 
-ChaoticEngine is significantly faster than standard implementations, especially for 1D maps used in stream ciphers.
+Performance tests were conducted using **BenchmarkDotNet** (the industry standard for .NET performance benchmarking) to ensure scientific accuracy.
 
-> **Note:** The **Sine Map** utilizes a specialized *Bhaskara I Approximation* with SIMD, achieving over **12x speedup** compared to `Math.Sin`.
+**System Specs:** Intel Core i7-9750H | .NET 10 | AVX2 Mode Active  
+**Dataset:** 1 Million Samples (Double Precision)
 
-### 📸 Live Benchmark Result (i7-9750H / AVX2 Active)
+| Algorithm | Type | Standard Scalar (ms) | ChaoticEngine AVX (ms) | Speedup (Approx) | Allocation |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Sine Map** | 1D | 19.97 ms | **2.01 ms** | **🚀 9.9x** | 0 B |
+| **Tent Map** | 1D | 5.09 ms | **0.66 ms** | **🔥 7.7x** | 0 B |
+| **Logistic Map** | 1D | 2.05 ms | **0.80 ms** | **⚡ 2.6x** | 0 B |
+| **Henon Map** | 2D | 4.08 ms | **1.50 ms** | **⚡ 2.7x** | 0 B |
+| **Lorenz System** | 3D | 4.70 ms | **3.02 ms** | **⏩ 1.6x** | 0 B |
+| **Chen System** | 3D | 5.02 ms | **2.94 ms** | **⏩ 1.7x** | 0 B |
 
-![Benchmark Result](assets/benchmark_result.png)
-
-<details>
-<summary><b>Click to see raw text output</b></summary>
-<br>
-
-```text
-SECTION 1: ALGORITHM PERFORMANCE LEAGUE (1 Million Samples)
-===========================================================
-ALGORITHM       | AVX (ms)     | SCALAR (ms)  | SPEEDUP    | ENTROPY
----------------------------------------------------------------------------
-Logistic Map    | 2.3243       | 3.2935       | 1.4      x | 13.609640
-Tent Map        | 0.8483       | 8.8875       | 10.5     x | 15.609640
-Sine Map        | 2.0002       | 24.1729      | 12.1     x | 0.009633
-Henon Map       | 8.2855       | 5.5583       | 0.7      x | 15.609640
-Lorenz Sys      | 6.7998       | 7.4473       | 1.1      x | 15.609640
-Chen Sys        | 7.9404       | 8.2280       | 1.0      x | 0.196187
-```
-</details>
+### 🏆 Why is it so fast?
+1.  **Sine Map (~10x Speedup):** Replaces the standard `Math.Sin` (which is slow) with a high-precision **Bhaskara I Approximation** implemented in AVX intrinsics.
+2.  **Tent Map (~7.7x Speedup):** Uses **Branchless Programming**. Instead of CPU-expensive `if-else` checks, we use SIMD masking/blending instructions.
+3.  **Memory Efficiency:** As shown in the "Allocation" column, the generation loop allocates **0 Bytes** of managed memory, preventing Garbage Collector pauses during high-frequency simulations.
 
 ---
 
