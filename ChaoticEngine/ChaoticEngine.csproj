@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Optimize>true</Optimize>
+		<Platform>AnyCPU</Platform>
+
+		<PackageId>ChaoticEngine</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Zeynel Ümit Korkmaz</Authors>
+		<Company>Chaotic Systems Lab</Company>
+		<Description>High-performance Chaos Theory library including Core generators and Analysis tools.</Description>
+
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<!--
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
+	</ItemGroup>
+	-->
+</Project>

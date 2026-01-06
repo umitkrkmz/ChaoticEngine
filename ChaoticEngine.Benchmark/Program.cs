@@ -5,6 +5,13 @@ using ChaoticEngine.Core;
 
 namespace ChaoticEngine.Benchmark;
 
+
+/*
+ 
+ To enable benchmarkdotnet to recognize Program.cs, remove the comments from the ChaoticEngine.csproj file.
+ 
+ */
+
 class Program
 {
     static void Main(string[] args)

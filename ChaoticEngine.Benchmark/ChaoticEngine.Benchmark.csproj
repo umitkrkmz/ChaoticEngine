@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ChaoticEngine.Analysis\ChaoticEngine.Analysis.csproj" />
-    <ProjectReference Include="..\ChaoticEngine.Core\ChaoticEngine.Core.csproj" />
+    <ProjectReference Include="..\ChaoticEngine\ChaoticEngine.csproj" />
   </ItemGroup>
 
 </Project>

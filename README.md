@@ -6,7 +6,7 @@
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/download/dotnet/10.0)
 [![SIMD](https://img.shields.io/badge/Hardware_Accel-AVX2_%2F_AVX--512-blueviolet?style=for-the-badge)](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![NuGet](https://img.shields.io/badge/NuGet-Coming%20Soon-yellow?style=for-the-badge&logo=nuget)](https://www.nuget.org/)
+[![Release](https://img.shields.io/badge/Release-v1.0.0-blue?style=for-the-badge&logo=github)](https://github.com/umitkrkmz/ChaoticEngine/releases)
 [![Status](https://img.shields.io/badge/Status-Stable-success?style=for-the-badge)](https://github.com/umitkrkmz/ChaoticEngine)
 
 <p align="center">
@@ -69,11 +69,22 @@ Performance tests were conducted using **BenchmarkDotNet** (the industry standar
 ---
 
 ## 📦 Installation
+
+### Option 1: NuGet (Local / Manual)
+Since this is a research-grade library, you can download the latest `.nupkg` file from the **[Releases](https://github.com/umitkrkmz/ChaoticEngine/releases)** page.
+
+1. Download `ChaoticEngine.1.0.0.nupkg`.
+2. Add it to your local NuGet source or install directly via CLI:
+
+```bash
+dotnet add package ChaoticEngine --source "C:\Path\To\Your\LocalPackages"
+```
+
+### Option 2: Source Code
 This library is designed for **.NET 10.**
 ```bash
 git clone https://github.com/umitkrkmz/ChaoticEngine.git
 ```
-> **Note:** A generic NuGet package (ChaoticEngine) containing only the core libraries will be published soon. Currently, please clone the repository to run benchmarks.
 
 ---
 
