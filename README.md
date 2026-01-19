@@ -1,70 +1,79 @@
 ﻿<div align="center">
 
-# 🌌 ChaoticEngine
-### High-Performance Chaos Theory & Security Library for .NET 10
+# 🌌 ChaoticEngine v2.0
+### The Hybrid Chaos Framework: Scientific Simulation & High-Performance Encryption
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/download/dotnet/10.0)
 [![SIMD](https://img.shields.io/badge/Hardware_Accel-AVX2_%2F_AVX--512-blueviolet?style=for-the-badge)](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
+[![Security](https://img.shields.io/badge/Security-Zero--Allocation-red?style=for-the-badge)]()
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Release](https://img.shields.io/badge/Release-v1.0.0-blue?style=for-the-badge&logo=github)](https://github.com/umitkrkmz/ChaoticEngine/releases)
-[![Status](https://img.shields.io/badge/Status-Stable-success?style=for-the-badge)](https://github.com/umitkrkmz/ChaoticEngine)
+[![Release](https://img.shields.io/badge/Release-v2.0.0-blue?style=for-the-badge&logo=github)](https://github.com/umitkrkmz/ChaoticEngine/releases)
 
 <p align="center">
-  <b>ChaoticEngine</b> is a research-grade library designed for <b>Cryptography</b>, <b>Steganography</b>, and <b>High-Entropy Simulations</b>.<br>
-  It leverages modern .NET 10 intrinsics to unlock the full potential of your CPU using <b>AVX-512</b> and <b>AVX2</b> instruction sets.
+  <b>ChaoticEngine</b> is a dual-purpose library for .NET 10.<br>
+  It features a <b>Scientific Edition</b> for high-precision double-floating point simulations and a new <b>Security Edition</b> for ultra-fast, integer-based real-time encryption.
 </p>
 
-[Features](#-key-features) •
-[Benchmarks](#-performance-benchmarks) •
+[Security Benchmarks](#-security-benchmarks-v20) •
+[Scientific Benchmarks](#-scientific-benchmarks-v10) •
+[Methodology](#-benchmark-methodology) •
 [Installation](#-installation) •
-[Usage](#-usage) •
-[Algorithms](#-supported-algorithms)
+[Usage](#-usage)
 
 </div>
 
 ---
 
-## 🚀 Key Features
+## 🔥 What's New in v2.0?
 
-### ⚡ Adaptive Hardware Acceleration
-The engine automatically detects CPU capabilities at runtime and selects the fastest execution path without user intervention:
-* **Gear 1: AVX-512 (512-bit)** - Processes **8** independent chaotic streams per cycle.
-* **Gear 2: AVX2 (256-bit)** - Processes **4** independent chaotic streams per cycle.
-* **Gear 3: Scalar Fallback** - Universal compatibility for older hardware.
+Version 2.0 introduces the **ChaosCipher** engine, designed for high-throughput scenarios, capable of handling 4K/1080p Video Streaming workloads with ease.
 
-### 🧮 Advanced Optimization Techniques
-* **Interleaved Multi-State Simulation:** Overcomes the sequential dependency of chaos equations ($x_{n+1} = f(x_n)$) by simulating multiple independent "universes" in parallel vector lanes.
-* **Branchless Logic:** Uses SIMD masking and blending instead of `if-else` branches (e.g., in Tent Map) to prevent CPU pipeline stalls.
-* **Bhaskara Approximation:** Uses optimized algebraic approximations for trigonometric functions in SIMD (Sine Map) to avoid costly `Math.Sin` calls.
+* **🚀 Integer Arithmetic Core:** Replaced floating-point math with bitwise integer operations (XOR, Shift, Rotate) to bypass FPU bottlenecks.
+* **💉 SIMD Injection:** Uses `Vector256<uint>` (AVX2) to process **32 bytes** of data in a single CPU cycle.
+* **🚫 Zero-Allocation Architecture:** The encryption engine operates **In-Place** using `Span<T>` and `pointers`. It generates **0 Bytes** of Garbage Collection (GC) pressure, ensuring smooth video playback without micro-stutters.
 
-### 🛠️ Core Capabilities
-* **🧬 Comprehensive Algorithm Suite:** Implements 6 distinct chaotic algorithms (1D Maps, 2D Attractors, 3D Differential Systems).
-* **🛡️ Cryptographic Quality:** Validated high Shannon Entropy. Suitable for Stream Ciphers and PRNGs.
-* **🕵️ Steganography Tools:** Built-in utilities for **LSB (Least Significant Bit)** data hiding with **Zero-Loss (MSE: 0.0)** recovery capability.
-* **📊 Analysis Module:** Includes `QualityMetrics` for MSE, PSNR, RMSE, NPCR, and Entropy calculations.
-* **🏭 Zero-Allocation Architecture:** Validated with **BenchmarkDotNet**. The core engine produces **0 Bytes** of garbage per generation cycle using `Span<T>`.
 ---
 
-## 🏎️ Performance Benchmarks
+## 🛡️ Security Benchmarks (v2.0)
 
-Performance tests were conducted using **BenchmarkDotNet** (the industry standard for .NET performance benchmarking) to ensure scientific accuracy.
+We compared **ChaosLink (ChaosCipher)** against the industry standard **AES-256 (AES-NI accelerated)** and Google's **ChaCha20**.
 
-**System Specs:** Intel Core i7-9750H | .NET 10 | AVX2 Mode Active  
-**Dataset:** 1 Million Samples (Double Precision)
-
-| Algorithm | Type | Standard Scalar (ms) | ChaoticEngine AVX (ms) | Speedup (Approx) | Allocation |
+| Algorithm | Type | Time (Mean) | Speed (approx) | Allocation | GC Pressure |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Sine Map** | 1D | 19.97 ms | **2.01 ms** | **🚀 9.9x** | 0 B |
-| **Tent Map** | 1D | 5.09 ms | **0.66 ms** | **🔥 7.7x** | 0 B |
-| **Logistic Map** | 1D | 2.05 ms | **0.80 ms** | **⚡ 2.6x** | 0 B |
-| **Henon Map** | 2D | 4.08 ms | **1.50 ms** | **⚡ 2.7x** | 0 B |
-| **Lorenz System** | 3D | 4.70 ms | **3.02 ms** | **⏩ 1.6x** | 0 B |
-| **Chen System** | 3D | 5.02 ms | **2.94 ms** | **⏩ 1.7x** | 0 B |
+| **AES-256 (CBC)** | Block Cipher | 937.9 µs | *Reference* | 528 B | Low |
+| **ChaCha20** | Stream Cipher | 2,702.6 µs | 0.3x (Slower) | 1,048 KB | **High** |
+| **ChaosCipher v2** | **Stream Cipher** | **31.3 µs** | **🚀 30x Faster** | **0 B** | **None** |
 
-### 🏆 Why is it so fast?
-1.  **Sine Map (~10x Speedup):** Replaces the standard `Math.Sin` (which is slow) with a high-precision **Bhaskara I Approximation** implemented in AVX intrinsics.
-2.  **Tent Map (~7.7x Speedup):** Uses **Branchless Programming**. Instead of CPU-expensive `if-else` checks, we use SIMD masking/blending instructions.
-3.  **Memory Efficiency:** As shown in the "Allocation" column, the generation loop allocates **0 Bytes** of managed memory, preventing Garbage Collector pauses during high-frequency simulations.
+> **Analysis:** Even with hardware-accelerated AES-NI, standard AES is ~30x slower than ChaosCipher. ChaCha20 suffers from high memory allocation (~1MB per frame), causing GC spikes. **Based on the 1MB payload test, ChaosCipher demonstrates a theoretical throughput exceeding 30 GB/s, making it ideal for real-time systems where standard algorithms introduce latency.**
+
+---
+
+## 🔬 Scientific Benchmarks (v1.0)
+
+For researchers requiring double-precision accuracy (e.g., for Phase Space Analysis or Butterfly Effect simulations), the Scientific Engine leverages AVX-512 optimizations.
+
+| Algorithm | Type | Standard Scalar (ms) | ChaoticEngine AVX (ms) | Speedup |
+| :--- | :---: | :---: | :---: | :---: |
+| **Sine Map** | 1D | 19.97 ms | **2.01 ms** | **9.9x** |
+| **Tent Map** | 1D | 5.09 ms | **0.66 ms** | **7.7x** |
+| **Logistic Map** | 1D | 2.05 ms | **0.80 ms** | **2.6x** |
+| **Lorenz System** | 3D | 4.70 ms | **3.02 ms** | **1.6x** |
+
+---
+
+## 📏 Benchmark Methodology
+
+Transparency is key to scientific validity. All results were obtained using **BenchmarkDotNet v0.15.8**, the industry-standard tool for .NET performance tracking.
+
+* **Hardware:** Intel Core i7-9750H @ 2.60GHz (12 Logical Cores).
+* **Environment:** .NET 10.0 SDK, Windows 11 (x64), Release Build.
+* **Test Conditions:**
+    * **Payload:** 1 MB (1,048,576 bytes) random binary data (representing a large video frame).
+    * **Warmup:** 10+ iterations per method to stabilize JIT compiler.
+    * **Measurement:** Arithmetic Mean of 100+ iterations.
+    * **Memory:** Measured using `MemoryDiagnoser` to track Gen0/Gen1/Gen2 GC collections.
+* **Verification:** AES and ChaCha20 implementations use the standard `System.Security.Cryptography` libraries for fair comparison.
+
 
 ---
 
@@ -73,7 +82,7 @@ Performance tests were conducted using **BenchmarkDotNet** (the industry standar
 ### Option 1: NuGet (Local / Manual)
 Since this is a research-grade library, you can download the latest `.nupkg` file from the **[Releases](https://github.com/umitkrkmz/ChaoticEngine/releases)** page.
 
-1. Download `ChaoticEngine.1.0.0.nupkg`.
+1. Download `ChaoticEngine.2.0.0.nupkg`.
 2. Add it to your local NuGet source or install directly via CLI:
 
 ```bash
@@ -86,37 +95,54 @@ This library is designed for **.NET 10.**
 git clone https://github.com/umitkrkmz/ChaoticEngine.git
 ```
 
+### Enable Unsafe Blocks
+Since v2.0 uses high-performance pointer arithmetic, you must enable `unsafe` blocks in your consuming project's `.csproj` file:
+
+```xml
+<PropertyGroup>
+   <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+</PropertyGroup>
+```
+
 ---
 
 ## 💻 Usage
-**1. Generating Chaos (The Factory Pattern)**\
-You don't need to worry about hardware support; the factory handles it.
+**1. Security Edition (Encryption)**\
+Encrypt a byte array (or video frame) in-place with zero allocation.
+
+```csharp
+using ChaoticEngine.Security;
+
+// Inputs
+byte[] data = GetVideoFrame(); // e.g., 1MB buffer
+byte[] key  = new byte[32];    // Shared Secret
+byte[] iv   = new byte[16];    // Random Salt
+
+// Encrypt (In-Place) - Super Fast!
+ChaosCipher.Process(data, key, iv);
+
+// Send 'data' over network...
+
+// Decrypt (Same operation)
+ChaosCipher.Process(data, key, iv);
+```
+
+**2. Scientific Edition (Simulation)**\
+Perfect for verifying Steganography or Image Encryption results.
 
 ```csharp
 using ChaoticEngine.Core;
 
-// Create a generator (Auto-detects AVX-512/AVX2)
-var engine = ChaosFactory.Create1D(ChaosType.SineMap);
+// Create a 3D Lorenz Generator
+var engine = ChaosFactory.Create3D(ChaosType.LorenzSystem);
 
-// Generate 1 Million chaotic numbers
-double[] buffer = new double[1_000_000];
-engine.Generate(buffer, initialCondition: 0.5);
-```
+// Buffers for X, Y, Z coordinates
+double[] x = new double[1000];
+double[] y = new double[1000];
+double[] z = new double[1000];
 
-**2. Signal Analysis & Quality Control**\
-Perfect for verifying Steganography or Image Encryption results.
-
-```csharp
-using ChaoticEngine.Analysis;
-
-double[] original = LoadAudio("cover.wav");
-double[] stego    = LoadAudio("stego.wav");
-
-// Calculate Imperceptibility (PSNR)
-double mse  = QualityMetrics.CalculateMse(original, stego);
-double psnr = QualityMetrics.CalculatePsnr(mse, maxValue: 2.0);
-
-Console.WriteLine($"PSNR: {psnr} dB"); // > 60 dB is invisible to human perception
+// Generate
+engine.Generate(x, y, z, x0: 0.1, y0: 0.1, z0: 0.1);
 ```
 
 ---
