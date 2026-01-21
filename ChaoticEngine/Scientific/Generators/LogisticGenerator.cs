@@ -1,17 +1,34 @@
-﻿using System.Runtime.CompilerServices;
+﻿using ChaoticEngine.Scientific.Common;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
-namespace ChaoticEngine.Core;
+namespace ChaoticEngine.Scientific.Generators;
 
+/// <summary>
+/// Implements the Logistic Map, a polynomial mapping (degree 2) often cited as an archetypal example 
+/// of how complex, chaotic behavior can arise from very simple non-linear dynamical equations.
+/// <br/>Originally used for demographic models (population growth).
+/// </summary>
 public class LogisticGenerator : IChaoticGenerator1D
 {
-    public double GrowthRate { get; init; } = 3.99; // Requires 3.57+ for chaos
+    /// <summary>
+    /// The growth rate 'r' (Canonical value: 3.99).
+    /// <list type="bullet">
+    /// <item>r &lt; 3: Population stabilizes.</item>
+    /// <item>3 &lt; r &lt; 3.5699: Period doubling bifurcations.</item>
+    /// <item>r &gt; 3.5699: <b>Onset of Chaos.</b></item>
+    /// </list>
+    /// </summary>
+    public double GrowthRate { get; init; } = 3.99;
 
     // Small epsilon to diverge parallel streams
     private const double Epsilon = 1e-10;
 
+    /// <summary>
+    /// Generates a chaotic sequence based on the Logistic Map equation: x = r * x * (1 - x).
+    /// </summary>
     public void Generate(Span<double> buffer, double x0)
     {
         int i = 0;
@@ -28,10 +45,6 @@ public class LogisticGenerator : IChaoticGenerator1D
         }
 
         // Stage 3: Scalar Fallback
-        // NOTE: Residual data after SIMD does not continue linearly from the last vector element 
-        // because vectors produced interleaved data. For simplicity, we start a new scalar series 
-        // from x0 or continue from the last buffer position.
-        
         double x = (i == 0) ? x0 : buffer[i - 1];
         for (; i < buffer.Length; i++)
         {
@@ -47,31 +60,24 @@ public class LogisticGenerator : IChaoticGenerator1D
         if (buffer.Length < count) return 0;
 
         // Step 1: Multi-State Initialization
-        // Instead of assigning the same x0 to all lanes, we shift them by epsilon.
-        // [x0, x0+e, x0+2e, ..., x0+7e]
         Span<double> seeds = stackalloc double[count];
         for (int k = 0; k < count; k++)
         {
             seeds[k] = x0 + (k * Epsilon);
-            // Simple bound check
             if (seeds[k] >= 1.0) seeds[k] -= 1.0;
         }
 
-        // Load Vectors
         Vector512<double> vX = Vector512.Create(seeds);
         Vector512<double> vR = Vector512.Create(GrowthRate);
         Vector512<double> vOne = Vector512.Create(1.0);
 
         int i = 0;
-        // 8 different chaos series progress simultaneously in parallel lanes.
         for (; i <= buffer.Length - count; i += count)
         {
             // Formula: x = r * x * (1 - x)
             var vOneMinusX = Avx512F.Subtract(vOne, vX);
             vX = Avx512F.Multiply(vR, Avx512F.Multiply(vX, vOneMinusX));
 
-            // Write results to memory
-            // Memory Layout: [S1_Gen1, S2_Gen1, ..., S8_Gen1, S1_Gen2, ...]
             vX.CopyTo(buffer.Slice(i));
         }
         return i;
@@ -83,7 +89,7 @@ public class LogisticGenerator : IChaoticGenerator1D
         int count = Vector256<double>.Count; // 4
         if (buffer.Length < count) return 0;
 
-        // Step 1: Multi-State Initialization (4 Parallel Streams)
+        // Step 1: Multi-State Initialization
         Span<double> seeds = stackalloc double[count];
         for (int k = 0; k < count; k++)
         {

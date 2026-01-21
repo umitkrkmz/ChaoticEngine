@@ -1,208 +1,161 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Configs;
-using ChaoticEngine.Core;
+﻿using System.Diagnostics;
+using System.Text;
+using ChaoticEngine.Analysis;
+using ChaoticEngine.Security.Cipher;
+using ChaoticEngine.Security.Primitives;
 
-namespace ChaoticEngine.Benchmark;
+// --- 1. INTRO SCREEN AND BANNER ---
+Console.ForegroundColor = ConsoleColor.Cyan;
+Console.WriteLine(@"
+   ______ __                  __  _        ______            _            
+  / ____// /_   ____ _ ____  / /_(_)_____ / ____/____   ____ _(_)___  ___ 
+ / /    / __ \ / __ `// __ \/ __// // ___// __/  / __ \ / __ `// // __ \/ _ \
+using ChaoticEngine.Security.Cipher;
+using ChaoticEngine.Security.Primitives;
+/ /___ / / / // /_/ // /_/ / /_ / // /__ / /___ / / / // /_/ // // / / /  __/
+\____//_/ /_/ \__,_/ \____/\__//_/ \___//_____//_/ /_/ \__, //_//_/ /_/\___/ 
+                                                      /____/                 
+   High-Performance Chaotic Cryptography Library | v1.0.0
+");
+Console.ResetColor();
 
+// --- 2. HARDWARE CAPABILITY ANALYSIS ---
+Console.WriteLine(" [1] System Capability Check:");
+if (System.Runtime.Intrinsics.X86.Avx512F.IsSupported)
+    PrintStatus(">> AVX-512 Acceleration", "AVAILABLE (Ultra Mode) 🚀", ConsoleColor.Green);
+else if (System.Runtime.Intrinsics.X86.Avx2.IsSupported)
+    PrintStatus(">> AVX2 Acceleration", "AVAILABLE (Turbo Mode) 🔥", ConsoleColor.Green);
+else if (System.Runtime.Intrinsics.Arm.AdvSimd.IsSupported)
+    PrintStatus(">> ARM NEON Acceleration", "AVAILABLE (Mobile Mode) 📱", ConsoleColor.Green);
+else
+    PrintStatus(">> SIMD Acceleration", "NOT FOUND (Scalar Mode) 🐢", ConsoleColor.Yellow);
 
-/*
- 
- To enable benchmarkdotnet to recognize Program.cs, remove the comments from the ChaoticEngine.csproj file.
- 
- */
+// --- 3. SANITY CHECK (INTEGRITY TEST) ---
+// We select the most complex algorithm (Lorenz 3D) to verify the engine's correctness.
+Console.WriteLine("\n [2] Integrity Self-Test (Lorenz 3D):");
+string secret = "ChaoticEngine: Where Speed meets Chaos.";
+byte[] originalBytes = Encoding.UTF8.GetBytes(secret);
+byte[] buffer = new byte[originalBytes.Length];
+Array.Copy(originalBytes, buffer, originalBytes.Length);
 
-class Program
+byte[] key = new byte[32]; new Random().NextBytes(key);
+byte[] iv = new byte[16]; new Random().NextBytes(iv);
+
+// Encrypt
+ChaosCipher3D<IntegerLorenz>.Process(buffer, key, iv);
+Console.WriteLine($"    Encrypted Hex: {BitConverter.ToString(buffer)}");
+
+// Decrypt (Symmetric stream cipher: running the process again decrypts it)
+ChaosCipher3D<IntegerLorenz>.Process(buffer, key, iv);
+string decrypted = Encoding.UTF8.GetString(buffer);
+
+if (secret == decrypted)
+    PrintStatus(">> Encryption/Decryption Cycle", "PASS ✅", ConsoleColor.Green);
+else
+    PrintStatus(">> Encryption/Decryption Cycle", "FAIL ❌", ConsoleColor.Red);
+
+// --- 4. BENCHMARK ARENA ---
+Console.WriteLine("\n [3] BENCHMARK ARENA (128 MB Data Processing):");
+Console.WriteLine(new string('-', 75));
+Console.WriteLine($"{"Algorithm",-20} | {"Dim",-5} | {"Speed (GB/s)",-15} | {"Randomness (Chi2)",-15}");
+Console.WriteLine(new string('-', 75));
+
+// Prepare Test Data (Fill with random noise to simulate realistic high-entropy data)
+int dataSize = 128 * 1024 * 1024; // 128 MB
+byte[] benchSourceData = new byte[dataSize];
+new Random().NextBytes(benchSourceData);
+
+// --- LET THE RACE BEGIN ---
+
+// 1D Algorithms
+RunBenchmark1D<IntegerTentMap>("Tent Map");
+RunBenchmark1D<IntegerLogisticMap>("Logistic Map");
+RunBenchmark1D<IntegerSineMap>("Sine Map");
+
+// 2D Algorithms
+RunBenchmark2D<IntegerHenonMap>("Henon Map");
+
+// 3D Algorithms
+RunBenchmark3D<IntegerLorenz>("Lorenz System");
+RunBenchmark3D<IntegerChen>("Chen System");
+
+Console.WriteLine(new string('-', 75));
+Console.WriteLine("\nAll systems operational. Press any key to exit...");
+Console.ReadKey();
+
+// --- HELPER METHODS (To avoid code duplication) ---
+
+void RunBenchmark1D<T>(string name) where T : struct, IChaoticPrimitive
 {
-    static void Main(string[] args)
-    {
-        // 1. AUTOMATIC SELECTION:
-        // If no specific request comes from the command line (if args are empty), we automatically issue the "*" (Run All) command. // This way, it doesn't ask for a menu and starts directly.
-        if (args.Length == 0)
-        {
-            args = ["*"];
-        }
+    // Create a clean copy of data to ensure fair conditions for every run
+    byte[] workData = new byte[dataSize];
+    benchSourceData.CopyTo(workData, 0);
 
-        // 2. COMBINING RESULTS:
-        // The JoinSummary option attempts to present the reports of all classes as a single report at the end of the test.
-        var config = DefaultConfig.Instance
-            .WithOptions(ConfigOptions.JoinSummary);
+    GC.Collect(); // Force Garbage Collection to clean up RAM before the run
+    var sw = Stopwatch.StartNew();
 
-        // run benchmarks
-        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, config);
-    }
+    ChaosCipher<T>.Process(workData, key, iv);
+
+    sw.Stop();
+    ReportResult(name, "1D", sw.Elapsed.TotalSeconds, workData);
 }
 
-// === BASE CLASS SETTINGS ===
-[MemoryDiagnoser]
-public abstract class BaseChaosBenchmark
+void RunBenchmark2D<T>(string name) where T : struct, IChaoticPrimitive2D
 {
-    [Params(1_000_000)]
-    public int N;
+    byte[] workData = new byte[dataSize];
+    benchSourceData.CopyTo(workData, 0);
 
-    protected double[] data;
-    protected double[] bufX, bufY, bufZ;
+    GC.Collect();
+    var sw = Stopwatch.StartNew();
 
-    [GlobalSetup]
-    public void Setup()
-    {
-        data = new double[N];
-        bufX = new double[N];
-        bufY = new double[N];
-        bufZ = new double[N];
-    }
+    ChaosCipher2D<T>.Process(workData, key, iv);
+
+    sw.Stop();
+    ReportResult(name, "2D", sw.Elapsed.TotalSeconds, workData);
 }
 
-// =========================================================
-// 1. LOGISTIC MAP
-// =========================================================
-public class LogisticBenchmarks : BaseChaosBenchmark
+void RunBenchmark3D<T>(string name) where T : struct, IChaoticPrimitive3D
 {
-    [Benchmark(Baseline = true)]
-    public void Scalar()
-    {
-        double x = 0.5;
-        for (int i = 0; i < N; i++)
-        {
-            x = 3.99 * x * (1 - x);
-            data[i] = x;
-        }
-    }
+    byte[] workData = new byte[dataSize];
+    benchSourceData.CopyTo(workData, 0);
 
-    [Benchmark]
-    public void AVX()
-    {
-        var generator = ChaosFactory.Create1D(ChaosType.LogisticMap);
-        generator.Generate(data, 0.5);
-    }
+    GC.Collect();
+    var sw = Stopwatch.StartNew();
+
+    ChaosCipher3D<T>.Process(workData, key, iv);
+
+    sw.Stop();
+    ReportResult(name, "3D", sw.Elapsed.TotalSeconds, workData);
 }
 
-// =========================================================
-// 2. TENT MAP
-// =========================================================
-public class TentBenchmarks : BaseChaosBenchmark
+void ReportResult(string name, string dim, double timeSeconds, Span<byte> data)
 {
-    [Benchmark(Baseline = true)]
-    public void Scalar()
-    {
-        double x = 0.5;
-        for (int i = 0; i < N; i++)
-        {
-            x = x < 0.5 ? 1.9999 * x : 1.9999 * (1 - x);
-            data[i] = x;
-        }
-    }
+    double throughput = (dataSize / (1024.0 * 1024.0 * 1024.0)) / timeSeconds;
 
-    [Benchmark]
-    public void AVX()
-    {
-        var generator = ChaosFactory.Create1D(ChaosType.TentMap);
-        generator.Generate(data, 0.5);
-    }
+    // Calculate Chi-Square only on the first 1MB for speed (Representative sample)
+    double chi2 = ImageMetrics.CalculateChiSquare(data.Slice(0, 1024 * 1024));
+
+    PrintRow(name, dim, throughput, chi2);
 }
 
-// =========================================================
-// 3. SINE MAP (Bhaskara Farkı)
-// =========================================================
-public class SineBenchmarks : BaseChaosBenchmark
+void PrintStatus(string label, string status, ConsoleColor color)
 {
-    [Benchmark(Baseline = true)]
-    public void Scalar()
-    {
-        double x = 0.5;
-        for (int i = 0; i < N; i++)
-        {
-            x = 4.0 * Math.Sin(Math.PI * x);
-            data[i] = x;
-        }
-    }
-
-    [Benchmark]
-    public void AVX()
-    {
-        var generator = ChaosFactory.Create1D(ChaosType.SineMap);
-        generator.Generate(data, 0.5);
-    }
+    Console.Write($"{label,-40}");
+    Console.ForegroundColor = color;
+    Console.WriteLine(status);
+    Console.ResetColor();
 }
 
-// =========================================================
-// 4. HENON MAP (2D)
-// =========================================================
-public class HenonBenchmarks : BaseChaosBenchmark
+void PrintRow(string name, string type, double speed, double chi2)
 {
-    [Benchmark(Baseline = true)]
-    public void Scalar()
-    {
-        double x = 0.1, y = 0.1;
-        for (int i = 0; i < N; i++)
-        {
-            double nx = 1 - 1.4 * x * x + y;
-            y = 0.3 * x;
-            x = nx;
-            bufX[i] = x;
-        }
-    }
+    string status = chi2 < 290 ? "PASS" : "WARN"; // Chi2 < 256+epsilon is ideal
+    // Color coding for speed
+    ConsoleColor speedColor = speed > 4.0 ? ConsoleColor.Green : (speed > 2.0 ? ConsoleColor.Yellow : ConsoleColor.White);
 
-    [Benchmark]
-    public void AVX()
-    {
-        var generator = ChaosFactory.Create2D(ChaosType.HenonMap);
-        generator.Generate(bufX, bufY, 0.1, 0.1);
-    }
-}
-
-// =========================================================
-// 5. LORENZ SYSTEM (3D)
-// =========================================================
-public class LorenzBenchmarks : BaseChaosBenchmark
-{
-    [Benchmark(Baseline = true)]
-    public void Scalar()
-    {
-        double x = 0.1, y = 0.1, z = 0.1;
-        double dt = 0.01;
-        for (int i = 0; i < N; i++)
-        {
-            double dx = 10 * (y - x) * dt;
-            double dy = (x * (28 - z) - y) * dt;
-            double dz = (x * y - 8.0 / 3.0 * z) * dt;
-            x += dx; y += dy; z += dz;
-            bufX[i] = x;
-        }
-    }
-
-    [Benchmark]
-    public void AVX()
-    {
-        var generator = ChaosFactory.Create3D(ChaosType.LorenzSystem);
-        generator.Generate(bufX, bufY, bufZ, 0.1, 0.1, 0.1);
-    }
-}
-
-// =========================================================
-// 6. CHEN SYSTEM (3D)
-// =========================================================
-public class ChenBenchmarks : BaseChaosBenchmark
-{
-    [Benchmark(Baseline = true)]
-    public void Scalar()
-    {
-        double x = 0.1, y = 0.1, z = 0.1;
-        double dt = 0.005;
-        for (int i = 0; i < N; i++)
-        {
-            double dx = 35 * (y - x) * dt;
-            double dy = ((28 - 35) * x - x * z + 28 * y) * dt;
-            double dz = (x * y - 3 * z) * dt;
-            x += dx; y += dy; z += dz;
-            bufX[i] = x;
-        }
-    }
-
-    [Benchmark]
-    public void AVX()
-    {
-        var generator = ChaosFactory.Create3D(ChaosType.ChenSystem);
-        generator.Generate(bufX, bufY, bufZ, 0.1, 0.1, 0.1);
-    }
+    Console.Write($"{name,-20} | {type,-5} | ");
+    Console.ForegroundColor = speedColor;
+    Console.Write($"{speed,-15:F2}");
+    Console.ResetColor();
+    Console.Write($" | {chi2,-10:F2} ({status})");
+    Console.WriteLine();
 }

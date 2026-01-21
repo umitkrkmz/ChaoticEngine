@@ -1,18 +1,34 @@
-﻿using System.Runtime.CompilerServices;
+﻿using ChaoticEngine.Scientific.Common;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
-namespace ChaoticEngine.Core;
+namespace ChaoticEngine.Scientific.Generators;
 
+/// <summary>
+/// Implements the Sine Map, a unimodal chaotic map.
+/// <br/>Equation: x = r * sin(pi * x).
+/// <para>
+/// <b>Note on Precision:</b> The scalar implementation uses <see cref="Math.Sin"/> for maximum precision.
+/// The AVX/AVX-512 implementations use the <b>Bhaskara I approximation</b> to achieve high throughput, 
+/// as standard trigonometric functions are expensive in SIMD.
+/// </para>
+/// </summary>
 public class SineGenerator : IChaoticGenerator1D
 {
-    // Parameter R (Between 0 and 4.0; 4.0 represents full chaos)
+    /// <summary>
+    /// Parameter R (Canonical value: 4.0).
+    /// <br/>Values close to 4.0 exhibit fully developed chaos.
+    /// </summary>
     public double R { get; init; } = 4.0;
 
     // Small epsilon to diverge parallel streams so each lane follows a distinct path
     private const double Epsilon = 1e-10;
 
+    /// <summary>
+    /// Generates a chaotic sequence based on the Sine Map.
+    /// </summary>
     public void Generate(Span<double> buffer, double x0)
     {
         int i = 0;
@@ -61,8 +77,7 @@ public class SineGenerator : IChaoticGenerator1D
         int i = 0;
         for (; i <= buffer.Length - count; i += count)
         {
-            // Bhaskara I Approximation: sin(pi*x) ≈ (16*x*(1-x)) / (5 - x*(1-x))
-            // Used because standard sin() is expensive in SIMD.
+            // Bhaskara I Approximation: sin(pi*x) ~ (16*x*(1-x)) / (5 - x*(1-x))
 
             // Term = x * (1 - x)
             var vTerm = Avx512F.Multiply(vX, Avx512F.Subtract(vOne, vX));

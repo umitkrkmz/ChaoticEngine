@@ -1,18 +1,33 @@
-﻿using System.Runtime.CompilerServices;
+﻿using ChaoticEngine.Scientific.Common;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
-namespace ChaoticEngine.Core;
+namespace ChaoticEngine.Scientific.Generators;
 
+/// <summary>
+/// Implements the Tent Map, a piecewise linear, one-dimensional map.
+/// <br/>Named for the tent-like shape of its graph. It allows for extremely fast generation due to simple arithmetic operations.
+/// </summary>
 public class TentGenerator : IChaoticGenerator1D
 {
-    // Tent Map Parameter (Usually between 1.9999 and 2.0 for full chaos)
+    /// <summary>
+    /// The control parameter 'Mu' (Canonical value: 1.9999).
+    /// <br/>Controls the height of the tent.
+    /// <list type="bullet">
+    /// <item>Values close to 2.0 exhibit full chaotic behavior filling the interval [0,1].</item>
+    /// <item>At exactly 2.0, the map is topologically conjugate to the Logistic Map (r=4.0).</item>
+    /// </list>
+    /// </summary>
     public double Mu { get; init; } = 1.9999;
 
     // Small epsilon to diverge parallel streams
     private const double Epsilon = 1e-10;
 
+    /// <summary>
+    /// Generates a chaotic sequence using the Tent Map equation: x = (x &lt; 0.5) ? mu*x : mu*(1-x).
+    /// </summary>
     public void Generate(Span<double> buffer, double x0)
     {
         int i = 0;
@@ -71,7 +86,6 @@ public class TentGenerator : IChaoticGenerator1D
             var right = Avx512F.Multiply(vMu, Avx512F.Subtract(vOne, vX));
 
             // 3. Blend: Select 'left' where mask is 1, 'right' where mask is 0.
-            // Note: BlendVariable param order: (false_val, true_val, mask).
             vX = Avx512F.BlendVariable(right, left, mask);
 
             vX.CopyTo(buffer.Slice(i));

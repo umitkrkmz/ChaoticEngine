@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="ChaoticEngine.Benchmark/ChaoticEngine.Benchmark.csproj" Id="9e788477-c225-4aa8-983c-850d86c81f7d" />
+  <Project Path="ChaoticEngine.Tests/ChaoticEngine.Tests.csproj" Id="5b5d8236-ad16-4c19-b776-15615cfb4163" />
+  <Project Path="ChaoticEngine.Viz/ChaoticEngine.Viz.csproj" Id="d07e09a2-4b79-4e84-a196-89376597ceca" />
   <Project Path="ChaoticEngine/ChaoticEngine.csproj" />
 </Solution>

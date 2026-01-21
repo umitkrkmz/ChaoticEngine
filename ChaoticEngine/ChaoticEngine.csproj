@@ -4,29 +4,30 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Optimize>true</Optimize>
 		<Platform>AnyCPU</Platform>
 
 		<PackageId>ChaoticEngine</PackageId>
-		<Version>2.0.0</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Authors>Umit Korkmaz</Authors>
-    <Description>High-Performance Chaos Library (Scientific &amp; Security Editions)</Description>
-    <PackageTags>chaos;cryptography;simd;avx2;encryption;security</PackageTags>		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Version>3.0.0</Version>
 		<Authors>Umit Korkmaz</Authors>
-		<Description>High-Performance Chaos Library (Scientific &amp; Security Editions)</Description>
-		
+		<Company>ChaoticEngine Contributors</Company>
+		<Description>High-Performance, SIMD-Accelerated Generic Chaos Cryptography Library. Supports 1D (Tent, Logistic), 2D (Henon), and 3D (Lorenz, Chen) chaotic maps with standard .NET Stream and Random interfaces.</Description>
+		<PackageTags>cryptography;chaos;encryption;security;simd;avx2;avx512;lorenz;henon;stream-cipher;random;chaos-theory</PackageTags>
 
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/umitkrkmz/ChaoticEngine</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
-	
 	<ItemGroup>
-		<PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
-	
+
 </Project>
